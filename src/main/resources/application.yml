@@ -1,6 +1,34 @@
 spring:
-  application:
-    name: auth-service
+  security:
+    oauth2:
+      client:
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT}
+            client-secret: ${KAKAO_SECRET}
+            client-authentication-method: client_secret_post
+            redirect-uri: http://localhost:8080/oauth/kakao/code
+            authorization-grant-type: authorization_code
+            client-name: kakao
+            scope:
+              - profile
+              - account_email
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect-uri: ${KAKAO_REDIREDT_URI}
+    grant-type: ${KAKAO_CLIENT_GRANT_TYPE}
 
 jwt:
-  key: ${JWT_SECRET_KEY}
+  secret: ${JWT_SECRET_KEY}
