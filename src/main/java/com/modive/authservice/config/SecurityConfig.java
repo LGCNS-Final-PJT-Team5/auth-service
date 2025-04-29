@@ -13,6 +13,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity //web Security를 사용할 수 있게
@@ -20,6 +22,12 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
+    private final String[] whitelist = {
+            "/oauth/kakao/**",
+            "/auth/**",
+            "/user/**",
+    };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -35,17 +43,13 @@ public class SecurityConfig {
                     exception.accessDeniedHandler(customAccessDeniedHandler);
                 });
 
-        /*
-        위에는 http의 특정 보안 구성을 비활성화하고, 인증 인가에 대한 예외를 처리하고 있다.
-         */
+
         http.authorizeHttpRequests(auth ->
-                auth.requestMatchers("/**")
+                auth.requestMatchers(whitelist)
                 .permitAll()
                 .anyRequest()
                 .authenticated());
-        /*
-        UsernamePasswordAuthentication 클래스 앞에 jwtAuthenticationFilter를 등록한다.
-         */
+
         return http.build();
     }
 }

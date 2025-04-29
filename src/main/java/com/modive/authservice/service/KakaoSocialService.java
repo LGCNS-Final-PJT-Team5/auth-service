@@ -2,6 +2,7 @@ package com.modive.authservice.service;
 
 import com.modive.authservice.client.KakaoApiClient;
 import com.modive.authservice.client.KakaoOauthClient;
+import com.modive.authservice.domain.User;
 import com.modive.authservice.jwt.JwtTokenProvider;
 import com.modive.authservice.jwt.UserAuthentication;
 import com.modive.authservice.properties.KakaoProperties;
@@ -12,6 +13,8 @@ import com.modive.authservice.response.SignUpSuccessResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,14 +39,25 @@ public class KakaoSocialService {
     }
 
     @Transactional
-    public SignUpSuccessResponse signUp(final String code) {
+    public SignUpSuccessResponse kakaoSignUp(final String code) {
         KakaoTokenResponse response = getIdToken(code);
 
         String accessToken = response.getAccessToken();
 
         KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + accessToken);
 
-        Long id = userService.createUser(userResponse);
+        System.out.println(userResponse);
+
+        Optional<User> user = userService.findKakaoUser(userResponse.id());
+
+        Long id = user.map(User::getUserId)
+                .orElse(-1L);
+
+        if (id == -1L) {
+            id = userService.createKakaoUser(userResponse);
+        }
+
+        System.out.println(id);
 
         UserAuthentication userAuthentication = new UserAuthentication(id, null, null);
 

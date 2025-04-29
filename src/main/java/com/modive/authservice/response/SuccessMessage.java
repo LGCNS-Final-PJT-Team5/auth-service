@@ -14,6 +14,7 @@ public class SuccessMessage {
     public static final String LOGOUT_SUCCESS = "로그아웃에 성공했습니다.";
     public static final String DELETE_SUCCESS = "삭제에 성공했습니다.";
     public static final String UPDATE_SUCCESS = "업데이트에 성공했습니다.";
+    public static final String USER_INFO_SUCCESS = "유저 정보 조회에 성공했습니다.";
     
     private int status;
     private String message;
@@ -22,6 +23,7 @@ public class SuccessMessage {
         this.status = status.value();
         this.message = message;
     }
+
 
     public static SuccessMessage of(HttpStatus status, String message) {
         return new SuccessMessage(status, message);

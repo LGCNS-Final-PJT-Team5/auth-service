@@ -1,10 +1,7 @@
 package com.modive.authservice.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,19 +20,29 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
-    @Column(unique = true)
-    private String email;
+    private Long reward;
 
     private String nickname;
 
-    private String password;
+    private String role;
 
     @Column(nullable = false)
     private String name;
 
-    private String profileImage;
+    @Column(unique = true)
+    private String email;
+
+    private LocalDateTime birthdate;
+
+    private LocalDateTime licenseDate;
+
+    private boolean alarm;
+
+    private String gender;
+
+    private String phone;
 
     private String socialId;  // 소셜 로그인 ID (카카오, 구글 등)
 
@@ -42,15 +50,18 @@ public class User {
 
     @CreatedDate
     @Column(updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createDateTime;
 
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateDateTime;
+
+    public Long getUserId() {
+        return userId;
+    }
 
     // 사용자 정보 업데이트 메서드
     public void updateProfile(String nickname, String profileImage) {
         this.nickname = nickname;
-        this.profileImage = profileImage;
     }
 
     // 소셜 로그인 정보 업데이트
@@ -65,14 +76,16 @@ public class User {
     }
 
     // 정적 팩토리 메서드
-    public static User of(String nickname, String profileImage, String email, String socialId) {
+    public static User of(String nickname, String email, String socialId, String socialType) {
         return User.builder()
+                .reward(0L)
                 .nickname(nickname)
-                .profileImage(profileImage)
+                .role("USER")
+                .name(nickname)
                 .email(email)
+                .alarm(false)
                 .socialId(socialId)
-                .socialType("KAKAO") // 기본값으로 카카오 설정
-                .name(nickname) // 기본값으로 닉네임을 이름으로 사용
+                .socialType(socialType)
                 .build();
     }
 
