@@ -53,6 +53,13 @@ public class UserService {
     }
 
     @Transactional
+    public String updateNickname(final Long userId, final String nickname) {
+        User user = userRepository.findByUserId(userId);
+        user.setNickname(nickname);
+        return userRepository.saveAndFlush(user).getNickname();
+    }
+
+    @Transactional
     public String deleteUser(final Long userId) {
         Long isDelete = userRepository.deleteUserByUserId(userId);
         if (Objects.equals(isDelete, userId)) {
@@ -61,6 +68,13 @@ public class UserService {
         else {
             return "유저 삭제에 실패했습니다.";
         }
+    }
+
+    @Transactional
+    public void updateUserReward(Long userId, Long reward) {
+        User user = userRepository.findByUserId(userId);
+        user.setReward(user.getReward() + reward);
+        userRepository.saveAndFlush(user);
     }
 
     @Transactional

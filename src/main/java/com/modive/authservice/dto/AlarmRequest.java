@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateAlarmRequest {
+public class AlarmRequest {
     private boolean alarm;
 }
