@@ -1,5 +1,6 @@
 package com.modive.authservice.jwt;
 
+import com.modive.authservice.domain.AdminDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -14,41 +15,69 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private static final String MEMBER_ID = "memberId";
-    private static final Long TOKEN_EXPIRATION_TIME = 24 * 60 * 60 * 1000L;
+    private static final String USER_ID = "userId";
+    private static final Long TOKEN_EXPIRATION_TIME = 60 * 60 * 1000L;
+    private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 14 * 24 * 60 * 60 * 1000L;
 
-    @Value("${jwt.secret}")
+    @Value("${spring.jwt.secret}")
     private String JWT_SECRET;
-
-    @PostConstruct
-    protected void init() {
-        JWT_SECRET = Base64.getEncoder().encodeToString(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
-    }
 
     public String generateToken(Authentication authentication) {
         final Date now = new Date();
 
-        final Claims claims = Jwts.claims()
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + TOKEN_EXPIRATION_TIME));  // 만료 시간 설정
-
-        claims.put(MEMBER_ID, authentication.getPrincipal());
         return Jwts.builder()
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // Header
-                .setClaims(claims) // Claim
-                .signWith(getSigningKey()) // Signature
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(authentication.getPrincipal().toString()) // memberId를 subject로 유지
+                .claim("userId", authentication.getPrincipal().toString())
+                .claim("role", "USER") // gateway-service와 일치하도록 role 값 설정
+                .setIssuer("http://localhost") // gateway-service와 일치하는 issuer 설정
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + TOKEN_EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(Authentication authentication) {
+        final Date now = new Date();
+        final String tokenId = UUID.randomUUID().toString();
+
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(authentication.getPrincipal().toString())
+                .claim("userId", authentication.getPrincipal().toString())
+                .claim("role", "USER")
+                .setId(tokenId) // jti 클레임 설정 - 토큰 고유 식별자
+                .setIssuer("http://localhost")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateAccessTokenFromUserId(Long userId) {
+        final Date now = new Date();
+
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(String.valueOf(userId))
+                .claim("userId", userId)
+                .claim("role", "USER")
+                .setIssuer("http://localhost")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + TOKEN_EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     private Key getSigningKey() {
-        String encodedKey = Base64.getEncoder().encodeToString(JWT_SECRET.getBytes()); //SecretKey 통해 서명 생성
-        return Keys.hmacShaKeyFor(encodedKey.getBytes());
+        return Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
     public JwtValidationType validateToken(String token) {
@@ -80,7 +109,55 @@ public class JwtTokenProvider {
 
     public Long getUserFromJwt(String token) {
         Claims claims = getBody(token);
-        return Long.valueOf(claims.get(MEMBER_ID).toString());
+        return Long.valueOf(claims.get(USER_ID).toString());
     }
 
+    public String generateTokenForAdmin(Authentication authentication) {
+        AdminDetails adminDetails = (AdminDetails) authentication.getPrincipal();
+        Long adminId = adminDetails.getAdminId();
+
+        final Date now = new Date();
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(String.valueOf(adminId))
+                .claim("userId", adminId)
+                .claim("role", "ADMIN")
+                .setIssuer("http://localhost")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + TOKEN_EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshTokenForAdmin(Authentication authentication) {
+        final Date now = new Date();
+        final String tokenId = UUID.randomUUID().toString();
+
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(authentication.getPrincipal().toString())
+                .claim("userId", authentication.getPrincipal().toString())
+                .claim("role", "Admin")
+                .setId(tokenId) // jti 클레임 설정 - 토큰 고유 식별자
+                .setIssuer("http://localhost")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateAccessTokenFromAdminId(Long adminId) {
+        final Date now = new Date();
+
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(String.valueOf(adminId))
+                .claim("userId", adminId)
+                .claim("role", "ADMIN")
+                .setIssuer("http://localhost")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + TOKEN_EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 }
