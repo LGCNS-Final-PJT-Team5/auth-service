@@ -1,4 +1,4 @@
-package com.modive.authservice.response;
+package com.modive.authservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

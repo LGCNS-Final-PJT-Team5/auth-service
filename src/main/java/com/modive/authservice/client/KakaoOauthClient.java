@@ -1,7 +1,7 @@
 package com.modive.authservice.client;
 
 import com.modive.authservice.config.FeignConfig;
-import com.modive.authservice.response.KakaoTokenResponse;
+import com.modive.authservice.dto.response.KakaoTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;

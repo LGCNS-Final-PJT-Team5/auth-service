@@ -1,4 +1,4 @@
-package com.modive.authservice.dto;
+package com.modive.authservice.dto.request;
 
 import lombok.Data;
 

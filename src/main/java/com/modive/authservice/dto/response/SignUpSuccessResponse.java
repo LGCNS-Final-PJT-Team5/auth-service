@@ -1,6 +1,5 @@
-package com.modive.authservice.response;
+package com.modive.authservice.dto.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,10 +17,10 @@ public class SignUpSuccessResponse {
         this.refreshToken = refreshToken;
     }
 
-    public static SignUpSuccessResponse of(String token) {
+    public static SignUpSuccessResponse of(String accessToken, String refreshToken) {
         return SignUpSuccessResponse.builder()
-                .accessToken(token)
-                .refreshToken("refresh_token")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 }

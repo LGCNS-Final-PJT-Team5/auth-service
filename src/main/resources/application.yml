@@ -1,51 +1,11 @@
-server:
-  port: 10000
-
 spring:
-  security:
-    oauth2:
-      client:
-        provider:
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
-        registration:
-          kakao:
-            client-id: ${KAKAO_CLIENT}
-            client-secret: ${KAKAO_SECRET}
-            client-authentication-method: client_secret_post
-            redirect-uri: http://localhost:8080/oauth/kakao/code
-            authorization-grant-type: authorization_code
-            client-name: kakao
-            scope:
-              - profile
-              - account_email
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/MODIVE
-    username: root
-    password:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-oauth:
-  kakao:
-    client-id: ${KAKAO_CLIENT}
-    client-secret: ${KAKAO_CLIENT_SECRET}
-    redirect-uri: ${KAKAO_REDIREDT_URI}
-    grant-type: ${KAKAO_CLIENT_GRANT_TYPE}
-
-jwt:
-  secret: ${JWT_SECRET_KEY}
+  profiles:
+    active: dev   # dev profile? ??
+  application:
+    name: auth-service
+  config:
+    import: configserver:http://localhost:8888
+  cloud:
+    config:
+      profile: dev    # dev profile ?? ?? ??
+      label: main

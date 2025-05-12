@@ -1,6 +1,6 @@
 package com.modive.authservice.client;
 
-import com.modive.authservice.response.KakaoUserResponse;
+import com.modive.authservice.dto.response.KakaoUserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;

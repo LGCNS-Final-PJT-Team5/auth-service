@@ -27,8 +27,6 @@ public class User {
 
     private String nickname;
 
-    private String role;
-
     @Column(nullable = false)
     private String name;
 
@@ -56,6 +54,8 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updateDateTime;
 
+    private boolean isActive;
+
     public Long getUserId() {
         return userId;
     }
@@ -81,12 +81,12 @@ public class User {
         return User.builder()
                 .reward(0L)
                 .nickname(nickname)
-                .role("USER")
                 .name(nickname)
                 .email(email)
                 .alarm(false)
                 .socialId(socialId)
                 .socialType(socialType)
+                .isActive(true)
                 .build();
     }
 
