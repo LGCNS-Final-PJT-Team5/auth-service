@@ -148,7 +148,7 @@ public class KakaoSocialService {
         User user = User.of(
                 request.getNickname(),
                 userResponse.kakaoAccount().profile().nickname(),
-                userResponse.kakaoAccount().profile().accountEmail(),
+                userResponse.kakaoAccount().email(),
                 request.getInterest(),
                 request.getDrivingExperience(),
                 String.valueOf(userResponse.id()),

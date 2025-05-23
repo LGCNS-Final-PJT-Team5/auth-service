@@ -33,13 +33,7 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    private LocalDateTime birthdate;
-
     private boolean alarm;
-
-    private String gender;
-
-    private String phone;
 
     private String interest;
 
@@ -93,5 +87,4 @@ public class User {
                 .isActive(true)
                 .build();
     }
-
 }
