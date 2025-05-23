@@ -40,6 +40,7 @@ public class Car {
                 .user(user)
                 .number(number)
                 .active(true)
+                .createDateTime(LocalDateTime.now())
                 .build();
     }
 }
