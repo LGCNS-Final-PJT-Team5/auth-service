@@ -35,13 +35,15 @@ public class User {
 
     private LocalDateTime birthdate;
 
-    private LocalDateTime licenseDate;
-
     private boolean alarm;
 
     private String gender;
 
     private String phone;
+
+    private String interest;
+
+    private Long drivingExperience;
 
     private String socialId;  // 소셜 로그인 ID (카카오, 구글 등)
 
@@ -77,12 +79,14 @@ public class User {
     }
 
     // 정적 팩토리 메서드
-    public static User of(String nickname, String email, String socialId, String socialType) {
+    public static User of(String name, String nickname, String email, String interest, Long drivingExperience, String socialId, String socialType) {
         return User.builder()
                 .reward(0L)
                 .nickname(nickname)
-                .name(nickname)
+                .name(name)
                 .email(email)
+                .interest(interest)
+                .drivingExperience(drivingExperience)
                 .alarm(false)
                 .socialId(socialId)
                 .socialType(socialType)

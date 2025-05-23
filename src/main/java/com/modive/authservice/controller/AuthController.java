@@ -1,14 +1,12 @@
 package com.modive.authservice.controller;
 
 import com.modive.authservice.domain.Admin;
-import com.modive.authservice.dto.request.AccessTokenRequest;
-import com.modive.authservice.dto.request.LoginRequest;
-import com.modive.authservice.dto.request.RegisterRequest;
-import com.modive.authservice.dto.request.TokenRefreshRequest;
+import com.modive.authservice.dto.request.*;
 import com.modive.authservice.dto.response.ApiResponse;
 import com.modive.authservice.dto.response.SignUpSuccessResponse;
 import com.modive.authservice.dto.response.TokenRefreshResponse;
 import com.modive.authservice.exception.InvalidTokenException;
+import com.modive.authservice.exception.SignupRequiredException;
 import com.modive.authservice.exception.TokenRefreshException;
 import com.modive.authservice.jwt.JwtTokenProvider;
 import com.modive.authservice.repository.AdminRepository;
@@ -47,6 +45,14 @@ public class AuthController {
     @Value("${spring.oauth.kakao.redirect-uri}")
     private String REST_API_URI;
 
+    @PostMapping("/test")
+    public ApiResponse<String> test(
+            @RequestBody final AccessTokenRequest request
+    ) {
+        String token = kakaoSocialService.testKakaoToken(request.getAccessToken());
+        return new ApiResponse<>(HttpStatus.OK, token);
+    }
+
     @GetMapping("/login")
     public ApiResponse<String> loginPath() {
         String url =  "https://kauth.kakao.com/oauth/authorize?client_id=" + REST_API_KEY + "&response_type=code&redirect_uri=" + REST_API_URI;
@@ -57,7 +63,19 @@ public class AuthController {
     public ApiResponse<SignUpSuccessResponse> signUp(
             @RequestBody final AccessTokenRequest request
     ) {
-        SignUpSuccessResponse response = kakaoSocialService.kakaoSignUp(request.getAccessToken());
+        try {
+            SignUpSuccessResponse response = kakaoSocialService.kakaoSignUp(request.getAccessToken());
+            return new ApiResponse<>(HttpStatus.OK, response);
+        } catch (SignupRequiredException e) {
+            return new ApiResponse<>(HttpStatus.NO_CONTENT);
+        }
+    }
+
+    @PostMapping("/register")
+    public ApiResponse<SignUpSuccessResponse> register(
+            @RequestBody final KakaoRegisterRequest request
+    ) {
+        SignUpSuccessResponse response = kakaoSocialService.createKakaoUser(request);
         return new ApiResponse<>(HttpStatus.OK, response);
     }
 
