@@ -1,6 +1,11 @@
 spring:
+  profiles:
+    active: dev   # dev profile? ??
   application:
     name: auth-service
-
-jwt:
-  key: ${JWT_SECRET_KEY}
+  config:
+    import: configserver:http://config-server:8888
+  cloud:
+    config:
+      profile: dev    # dev profile ?? ?? ??
+      label: main
