@@ -38,7 +38,7 @@ spec:
           # secret 불러오기
           envFrom:
             - secretRef:
-                name: admin-service-secrets
+                name: auth-service-secrets
 
           # 헬스체크 추가
           {{- if .Values.healthCheck.enabled }}
