@@ -41,6 +41,7 @@ spec:
                 name: auth-service-secrets
 
           # 헬스체크 추가
+          # readinessProbe -> livenessProbe 순서로 동작
           {{- if .Values.healthCheck.enabled }}
           livenessProbe:    # Pod이 죽지 않고 정상적으로 동작 중인지 확인
             httpGet:
