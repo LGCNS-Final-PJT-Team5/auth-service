@@ -9,10 +9,26 @@ service:
   type: ClusterIP   # 클러스터 내부에서만 접근 가능 (기본값)
   port: 80
 
-# 헬스체크 설정 (권장)
+# 헬스체크 설정
 healthCheck:
   enabled: true
   path: /actuator/health
   port: 8080
   initialDelaySeconds: 30
   periodSeconds: 10
+
+# Auth Service Config 값
+config:
+  server:
+    port: 8080
+  app:
+    name: auth-service
+  jpa:
+    hibernate:
+      ddlauto: update
+  datasource:
+    driverclassname: com.mysql.cj.jdbc.Driver
+  oauth:
+    kakao:
+      redirecturi: http://localhost:8080/oauth/kakao/code
+      granttype: authorization_code

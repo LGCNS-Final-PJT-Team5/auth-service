@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-config
+  labels:
+    app: auth-service
+    version: {{ .Chart.AppVersion | default "1.0" }}
+data:
+  application.yml: |
+    server:
+      port: {{ .Values.config.server.port | default 8080 }}
+
+    spring:
+      application:
+        name: {{ .Values.config.app.name | default "auth-service" }}
+      jpa:
+        hibernate:
+          ddl-auto: {{ .Values.config.jpa.hibernate.ddlauto | default "update" }}
+      datasource:
+        driver-class-name: {{ .Values.config.datasource.driverclassname | default "com.mysql.cj.jdbc.Driver"}}
+        url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+      oauth:
+        kakao:
+          client-id: ${KAKAO_CLIENT_ID}
+          client-secret: ${KAKAO_CLIENT_SECRET}
+          redirect-uri: {{ .Values.config.oauth.kakao.redirecturi }}
+          grant-type: {{ .Values.config.oauth.kakao.granttype | default "authorization_code"}}
+      jwt:
+        secret: ${JWT_SECRET}
+
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: "*"
