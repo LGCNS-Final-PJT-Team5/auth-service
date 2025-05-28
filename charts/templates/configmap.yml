@@ -29,9 +29,3 @@ data:
           grant-type: {{ .Values.config.oauth.kakao.granttype | default "authorization_code"}}
       jwt:
         secret: ${JWT_SECRET}
-
-    management:
-      endpoints:
-        web:
-          exposure:
-            include: "*"
