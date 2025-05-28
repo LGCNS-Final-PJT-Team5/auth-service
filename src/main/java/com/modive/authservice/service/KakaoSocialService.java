@@ -2,16 +2,20 @@ package com.modive.authservice.service;
 
 import com.modive.authservice.client.KakaoApiClient;
 import com.modive.authservice.client.KakaoOauthClient;
+import com.modive.authservice.domain.Car;
 import com.modive.authservice.domain.RefreshToken;
 import com.modive.authservice.domain.User;
+import com.modive.authservice.dto.request.KakaoRegisterRequest;
 import com.modive.authservice.dto.request.TokenRefreshRequest;
 import com.modive.authservice.dto.response.TokenRefreshResponse;
 import com.modive.authservice.exception.InvalidTokenException;
+import com.modive.authservice.exception.SignupRequiredException;
 import com.modive.authservice.exception.TokenRefreshException;
 import com.modive.authservice.jwt.JwtTokenProvider;
 import com.modive.authservice.jwt.JwtValidationType;
 import com.modive.authservice.jwt.UserAuthentication;
 import com.modive.authservice.properties.KakaoProperties;
+import com.modive.authservice.repository.CarRepository;
 import com.modive.authservice.repository.RefreshTokenRepository;
 import com.modive.authservice.repository.UserRepository;
 import com.modive.authservice.dto.response.KakaoTokenResponse;
@@ -39,6 +43,8 @@ public class KakaoSocialService {
     private final KakaoOauthClient kakaoOauthClient;
     private final KakaoProperties kakaoProperties;
 
+    private final CarRepository carRepository;
+
     @Transactional
     public KakaoTokenResponse getIdToken(String code) {
         return kakaoOauthClient.getToken(
@@ -49,11 +55,18 @@ public class KakaoSocialService {
                 kakaoProperties.clientSecret());
     }
 
-    @Transactional
-    public SignUpSuccessResponse kakaoSignUp(final String code) {
+    public String testKakaoToken(final String code) {
         KakaoTokenResponse response = getIdToken(code);
 
         String accessToken = response.getAccessToken();
+
+        KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + accessToken);
+
+        return accessToken;
+    }
+
+    @Transactional
+    public SignUpSuccessResponse kakaoSignUp(final String accessToken) {
 
         KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + accessToken);
 
@@ -63,9 +76,15 @@ public class KakaoSocialService {
                 .orElse(-1L);
 
         if (id == -1L) {
-            id = createKakaoUser(userResponse);
+            throw new SignupRequiredException();
         }
 
+        String[] TokenSet = generateToken(id);
+
+        return SignUpSuccessResponse.of(TokenSet[0], TokenSet[1]);
+    }
+
+    private String[] generateToken(Long id) {
         UserAuthentication userAuthentication = new UserAuthentication(id, null, null);
 
         String jwtAccessToken = jwtTokenProvider.generateToken(userAuthentication);
@@ -76,8 +95,7 @@ public class KakaoSocialService {
 
         RefreshToken refreshTokenEntity = RefreshToken.create(refreshToken, id, REFRESH_TOKEN_EXPIRATION_TIME);
         refreshTokenRepository.save(refreshTokenEntity);
-
-        return SignUpSuccessResponse.of(jwtAccessToken, refreshToken);
+        return new String[]{jwtAccessToken, refreshToken};
     }
 
     @Transactional
@@ -122,14 +140,30 @@ public class KakaoSocialService {
         refreshTokenRepository.deleteByUserId(userId);
     }
 
-    public Long createKakaoUser(final KakaoUserResponse userResponse) {
+    @Transactional
+    public SignUpSuccessResponse createKakaoUser(final KakaoRegisterRequest request) {
+
+        KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + request.getAccessToken());
+
         User user = User.of(
+                request.getNickname(),
                 userResponse.kakaoAccount().profile().nickname(),
-                userResponse.kakaoAccount().profile().accountEmail(),
+                userResponse.kakaoAccount().email(),
+                request.getInterest(),
+                request.getDrivingExperience(),
                 String.valueOf(userResponse.id()),
                 "kakao"
         );
-        return userRepository.save(user).getUserId();
+
+        Long id = userRepository.save(user).getUserId();
+
+        Car car = Car.of(user, request.getCarNumber());
+        carRepository.save(car);
+
+        String[] TokenSet = generateToken(id);
+
+        return SignUpSuccessResponse.of(TokenSet[0], TokenSet[1]);
+
     }
 
     public Optional<User> findKakaoUser(final Long socialId) {
