@@ -42,18 +42,18 @@ spec:
 
           # 헬스체크 추가
           {{- if .Values.healthCheck.enabled }}
-          livenessProbe:
+          livenessProbe:    # Pod이 죽지 않고 정상적으로 동작 중인지 확인
             httpGet:
               path: {{ .Values.healthCheck.path }}
               port: {{ .Values.healthCheck.port }}
             initialDelaySeconds: {{ .Values.healthCheck.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.periodSeconds }}
-          readinessProbe:
+          readinessProbe:   # Pod이 서비스 요청을 받을 준비가 되었는지 확인
             httpGet:
               path: {{ .Values.healthCheck.path }}
               port: {{ .Values.healthCheck.port }}
-            initialDelaySeconds: 5
-            periodSeconds: 5
+            initialDelaySeconds: {{ .Values.healthCheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.periodSeconds }}
           {{- end }}
 
           # 리소스 제한 (권장)
