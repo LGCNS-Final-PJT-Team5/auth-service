@@ -56,7 +56,8 @@ dependencies {
     implementation 'org.modelmapper:modelmapper:3.1.1'
 
     // mysql
-    implementation 'com.mysql:mysql-connector-j:8.0.33'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+
 }
 
 dependencyManagement {
