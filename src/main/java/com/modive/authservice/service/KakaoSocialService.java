@@ -146,8 +146,8 @@ public class KakaoSocialService {
         KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + request.getAccessToken());
 
         User user = User.of(
-                request.getNickname(),
                 userResponse.kakaoAccount().profile().nickname(),
+                request.getNickname(),
                 userResponse.kakaoAccount().email(),
                 request.getInterest(),
                 request.getDrivingExperience(),
