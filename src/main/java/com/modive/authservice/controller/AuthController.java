@@ -12,6 +12,7 @@ import com.modive.authservice.jwt.JwtTokenProvider;
 import com.modive.authservice.repository.AdminRepository;
 import com.modive.authservice.service.AdminDetailsService;
 import com.modive.authservice.service.KakaoSocialService;
+import com.modive.authservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,7 @@ public class AuthController {
 
     private final KakaoSocialService kakaoSocialService;
     private final AdminDetailsService adminDetailsService;
+    private final UserService userService;
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
@@ -77,6 +79,11 @@ public class AuthController {
     ) {
         SignUpSuccessResponse response = kakaoSocialService.createKakaoUser(request);
         return new ApiResponse<>(HttpStatus.OK, response);
+    }
+
+    @GetMapping("/nickname")
+    public ApiResponse<Boolean> nicknameDuplicateCheck(@RequestParam("search") String nickname) {
+        return new ApiResponse<>(HttpStatus.OK, userService.nicknameDuplicateCheck(nickname));
     }
 
     @PostMapping("/refresh")
