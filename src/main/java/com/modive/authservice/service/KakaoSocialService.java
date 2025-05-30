@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -72,10 +73,10 @@ public class KakaoSocialService {
 
         Optional<User> user = findKakaoUser(userResponse.id());
 
-        Long id = user.map(User::getUserId)
-                .orElse(-1L);
+        UUID id = user.map(User::getUserId)
+                .orElse(null);
 
-        if (id == -1L) {
+        if (id == null) {
             throw new SignupRequiredException();
         }
 
@@ -84,7 +85,7 @@ public class KakaoSocialService {
         return SignUpSuccessResponse.of(TokenSet[0], TokenSet[1]);
     }
 
-    private String[] generateToken(Long id) {
+    private String[] generateToken(UUID id) {
         UserAuthentication userAuthentication = new UserAuthentication(id, null, null);
 
         String jwtAccessToken = jwtTokenProvider.generateToken(userAuthentication);
@@ -113,7 +114,7 @@ public class KakaoSocialService {
                 .map(this::verifyRefreshTokenExpiration)
                 .map(refreshToken -> {
                     // 새 액세스 토큰 생성
-                    Long userId = refreshToken.getUserId();
+                    UUID userId = refreshToken.getUserId();
                     String newAccessToken = jwtTokenProvider.generateAccessTokenFromUserId(userId);
 
                     return new TokenRefreshResponse(newAccessToken, requestRefreshToken);
@@ -136,7 +137,7 @@ public class KakaoSocialService {
     }
 
     @Transactional
-    public void revokeAllUserTokens(Long userId) {
+    public void revokeAllUserTokens(UUID userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
 
@@ -155,7 +156,7 @@ public class KakaoSocialService {
                 "kakao"
         );
 
-        Long id = userRepository.save(user).getUserId();
+        UUID id = userRepository.save(user).getUserId();
 
         Car car = Car.of(user, request.getCarNumber());
         carRepository.save(car);

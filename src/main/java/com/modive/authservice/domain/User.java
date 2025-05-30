@@ -2,11 +2,13 @@ package com.modive.authservice.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "USERS")
@@ -18,10 +20,12 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class User {
 
+    @Getter
     @Id
-    @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name="uuid2", strategy = "uuid2")
+    @Column(name = "user_id", columnDefinition = "BINARY(16)")
+    private UUID userId;
 
     private Long reward;
 
@@ -51,10 +55,6 @@ public class User {
     private LocalDateTime updateDateTime;
 
     private boolean isActive;
-
-    public Long getUserId() {
-        return userId;
-    }
 
     // 사용자 정보 업데이트 메서드
     public void updateProfile(String nickname, String profileImage) {

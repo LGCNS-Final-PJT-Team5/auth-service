@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -93,7 +94,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(@RequestParam Long userId) {
+    public ApiResponse<Void> logout(@RequestParam UUID userId) {
         kakaoSocialService.revokeAllUserTokens(userId);
         return new ApiResponse<>(HttpStatus.OK);
     }
