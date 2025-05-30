@@ -94,7 +94,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(@RequestParam UUID userId) {
+    public ApiResponse<Void> logout(@RequestParam String userId) {
         kakaoSocialService.revokeAllUserTokens(userId);
         return new ApiResponse<>(HttpStatus.OK);
     }

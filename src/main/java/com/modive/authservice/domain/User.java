@@ -24,8 +24,8 @@ public class User {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
-    @Column(name = "user_id", columnDefinition = "BINARY(16)")
-    private UUID userId;
+    @Column(name = "user_id", columnDefinition = "VARCHAR(36)")
+    private String userId;
 
     private Long reward;
 

@@ -37,7 +37,7 @@ public class AdminDetailsService implements UserDetailsService {
 
     public SignUpSuccessResponse login(Authentication authentication) {
         AdminDetails adminDetails = (AdminDetails) authentication.getPrincipal();
-        UUID id = adminDetails.getAdminId();
+        String id = adminDetails.getAdminId();
 
         String accessToken = jwtTokenProvider.generateTokenForAdmin(authentication);
         String refreshToken = jwtTokenProvider.generateRefreshTokenForAdmin(authentication);
@@ -66,7 +66,7 @@ public class AdminDetailsService implements UserDetailsService {
                 .map(this::verifyRefreshTokenExpiration)
                 .map(refreshToken -> {
                     // 새 액세스 토큰 생성
-                    UUID adminId = refreshToken.getUserId();
+                    String adminId = refreshToken.getUserId();
                     String newAccessToken = jwtTokenProvider.generateAccessTokenFromAdminId(adminId);
 
                     return new TokenRefreshResponse(newAccessToken, requestRefreshToken);
@@ -97,7 +97,7 @@ public class AdminDetailsService implements UserDetailsService {
     }
 
     @Transactional
-    public void revokeAllUserTokens(UUID userId) {
+    public void revokeAllUserTokens(String userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
 }

@@ -16,7 +16,7 @@ public class AdminDetails implements UserDetails {
         this.admin = admin;
     }
 
-    public UUID getAdminId() {
+    public String getAdminId() {
         return admin.getAdminId();
     }
 

@@ -73,7 +73,7 @@ public class KakaoSocialService {
 
         Optional<User> user = findKakaoUser(userResponse.id());
 
-        UUID id = user.map(User::getUserId)
+        String id = user.map(User::getUserId)
                 .orElse(null);
 
         if (id == null) {
@@ -85,7 +85,7 @@ public class KakaoSocialService {
         return SignUpSuccessResponse.of(TokenSet[0], TokenSet[1]);
     }
 
-    private String[] generateToken(UUID id) {
+    private String[] generateToken(String id) {
         UserAuthentication userAuthentication = new UserAuthentication(id, null, null);
 
         String jwtAccessToken = jwtTokenProvider.generateToken(userAuthentication);
@@ -114,7 +114,7 @@ public class KakaoSocialService {
                 .map(this::verifyRefreshTokenExpiration)
                 .map(refreshToken -> {
                     // 새 액세스 토큰 생성
-                    UUID userId = refreshToken.getUserId();
+                    String userId = refreshToken.getUserId();
                     String newAccessToken = jwtTokenProvider.generateAccessTokenFromUserId(userId);
 
                     return new TokenRefreshResponse(newAccessToken, requestRefreshToken);
@@ -137,7 +137,7 @@ public class KakaoSocialService {
     }
 
     @Transactional
-    public void revokeAllUserTokens(UUID userId) {
+    public void revokeAllUserTokens(String userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
 
@@ -156,7 +156,7 @@ public class KakaoSocialService {
                 "kakao"
         );
 
-        UUID id = userRepository.save(user).getUserId();
+        String id = userRepository.save(user).getUserId();
 
         Car car = Car.of(user, request.getCarNumber());
         carRepository.save(car);

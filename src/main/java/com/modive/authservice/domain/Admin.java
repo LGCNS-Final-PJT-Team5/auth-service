@@ -24,8 +24,8 @@ public class Admin {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
-    @Column(name = "admin_id", columnDefinition = "BINARY(16)")
-    private UUID adminId;
+    @Column(name = "admin_id", columnDefinition = "VARCHAR(36)")
+    private String adminId;
 
     @Column(nullable = false, unique = true)
     private String nickname;

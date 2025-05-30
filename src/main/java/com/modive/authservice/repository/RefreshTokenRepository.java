@@ -11,16 +11,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
 
     Optional<RefreshToken> findByToken(String token);
 
-    Optional<RefreshToken> findByUserId(UUID userId);
+    Optional<RefreshToken> findByUserId(String userId);
 
     @Modifying
     @Query("DELETE FROM RefreshToken rt WHERE rt.expiryDate < :now")
     void deleteExpiredTokens(LocalDateTime now);
 
     @Modifying
-    void deleteByUserId(UUID userId);
+    void deleteByUserId(String userId);
 }

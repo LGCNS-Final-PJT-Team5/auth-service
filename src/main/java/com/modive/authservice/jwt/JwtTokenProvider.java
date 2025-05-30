@@ -62,13 +62,13 @@ public class JwtTokenProvider {
     }
 
     // UUID 타입으로 변경
-    public String generateAccessTokenFromUserId(UUID userId) {
+    public String generateAccessTokenFromUserId(String userId) {
         final Date now = new Date();
 
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setSubject(userId.toString()) // UUID를 문자열로 변환
-                .claim("userId", userId.toString()) // UUID를 문자열로 저장
+                .setSubject(userId) // UUID를 문자열로 변환
+                .claim("userId", userId) // UUID를 문자열로 저장
                 .claim("role", "USER")
                 .setIssuer("http://localhost")
                 .setIssuedAt(now)
@@ -109,26 +109,26 @@ public class JwtTokenProvider {
     }
 
     // UUID 타입으로 변경
-    public UUID getUserFromJwt(String token) {
+    public String getUserFromJwt(String token) {
         Claims claims = getBody(token);
         String userIdStr = claims.get(USER_ID).toString();
         try {
-            return UUID.fromString(userIdStr);
+            return userIdStr;
         } catch (IllegalArgumentException e) {
             // 기존 Long 값이 있을 수 있으므로 예외 처리
-            throw new JwtException("Invalid UUID format in token: " + userIdStr, e);
+            throw new JwtException("Invalid String format in token: " + userIdStr, e);
         }
     }
 
     public String generateTokenForAdmin(Authentication authentication) {
         AdminDetails adminDetails = (AdminDetails) authentication.getPrincipal();
-        UUID adminId = adminDetails.getAdminId(); // Long -> UUID로 변경 필요
+        String adminId = adminDetails.getAdminId(); // Long -> UUID로 변경 필요
 
         final Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setSubject(adminId.toString()) // UUID를 문자열로 변환
-                .claim("userId", adminId.toString()) // UUID를 문자열로 저장
+                .setSubject(adminId) // UUID를 문자열로 변환
+                .claim("userId", adminId) // UUID를 문자열로 저장
                 .claim("role", "ADMIN")
                 .setIssuer("http://localhost")
                 .setIssuedAt(now)
@@ -155,13 +155,13 @@ public class JwtTokenProvider {
     }
 
     // UUID 타입으로 변경
-    public String generateAccessTokenFromAdminId(UUID adminId) {
+    public String generateAccessTokenFromAdminId(String adminId) {
         final Date now = new Date();
 
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setSubject(adminId.toString()) // UUID를 문자열로 변환
-                .claim("userId", adminId.toString()) // UUID를 문자열로 저장
+                .setSubject(adminId) // UUID를 문자열로 변환
+                .claim("userId", adminId) // UUID를 문자열로 저장
                 .claim("role", "ADMIN")
                 .setIssuer("http://localhost")
                 .setIssuedAt(now)

@@ -23,7 +23,7 @@ public class RefreshToken {
     private String token;
 
     @Column(nullable = false)
-    private UUID userId;
+    private String userId;
 
     @Column(nullable = false)
     private LocalDateTime expiryDate;
@@ -32,7 +32,7 @@ public class RefreshToken {
     private LocalDateTime createdAt;
 
     @Builder
-    public RefreshToken(String token, UUID userId, LocalDateTime expiryDate) {
+    public RefreshToken(String token, String userId, LocalDateTime expiryDate) {
         this.token = token;
         this.userId = userId;
         this.expiryDate = expiryDate;
@@ -43,7 +43,7 @@ public class RefreshToken {
         return expiryDate.isBefore(LocalDateTime.now());
     }
 
-    public static RefreshToken create(String token, UUID userId, long expiryTimeInMillis) {
+    public static RefreshToken create(String token, String userId, long expiryTimeInMillis) {
         LocalDateTime expiryDate = LocalDateTime.now().plusNanos(expiryTimeInMillis * 1_000_000);
         return RefreshToken.builder()
                 .token(token)

@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<User, String> {
 
     // 이메일로 사용자 찾기
     Optional<User> findByEmail(String email);
@@ -23,11 +23,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // 닉네임이 존재하는지 확인
     boolean existsByNickname(String nickname);
 
-    User findByUserId(UUID userId);
+    User findByUserId(String userId);
 
     User findByNickname(String nickname);
 
     List<User> findAll();
 
-    UUID deleteUserByUserId(UUID userId);
+    String deleteUserByUserId(String userId);
 }
