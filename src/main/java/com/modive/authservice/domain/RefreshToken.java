@@ -1,17 +1,14 @@
 package com.modive.authservice.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
 @Table(name = "refresh_tokens")
 public class RefreshToken {
 
@@ -38,6 +35,8 @@ public class RefreshToken {
         this.expiryDate = expiryDate;
         this.createdAt = LocalDateTime.now();
     }
+
+    public RefreshToken() {};
 
     public boolean isExpired() {
         return expiryDate.isBefore(LocalDateTime.now());

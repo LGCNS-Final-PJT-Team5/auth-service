@@ -24,6 +24,8 @@ import com.modive.authservice.dto.response.SignUpSuccessResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,6 +34,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class KakaoSocialService {
+
+    private static final Logger logger = LoggerFactory.getLogger(KakaoSocialService.class);
 
     private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 14 * 24 * 60 * 60 * 1000L;
 
@@ -57,13 +61,18 @@ public class KakaoSocialService {
     }
 
     public String testKakaoToken(final String code) {
-        KakaoTokenResponse response = getIdToken(code);
+        try {
+            KakaoTokenResponse response = getIdToken(code);
 
-        String accessToken = response.getAccessToken();
+            String accessToken = response.getAccessToken();
 
-        KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + accessToken);
+            KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + accessToken);
 
-        return accessToken;
+            return accessToken;
+        } catch (Exception e) {
+            logger.error("Error occurred while getting kakao token", e);
+            return null;
+        }
     }
 
     @Transactional
