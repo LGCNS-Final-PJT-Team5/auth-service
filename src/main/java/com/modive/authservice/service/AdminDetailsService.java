@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class AdminDetailsService implements UserDetailsService {
 
     public SignUpSuccessResponse login(Authentication authentication) {
         AdminDetails adminDetails = (AdminDetails) authentication.getPrincipal();
-        Long id = adminDetails.getAdminId();
+        String id = adminDetails.getAdminId();
 
         String accessToken = jwtTokenProvider.generateTokenForAdmin(authentication);
         String refreshToken = jwtTokenProvider.generateRefreshTokenForAdmin(authentication);
@@ -65,7 +66,7 @@ public class AdminDetailsService implements UserDetailsService {
                 .map(this::verifyRefreshTokenExpiration)
                 .map(refreshToken -> {
                     // 새 액세스 토큰 생성
-                    Long adminId = refreshToken.getUserId();
+                    String adminId = refreshToken.getUserId();
                     String newAccessToken = jwtTokenProvider.generateAccessTokenFromAdminId(adminId);
 
                     return new TokenRefreshResponse(newAccessToken, requestRefreshToken);
@@ -96,7 +97,7 @@ public class AdminDetailsService implements UserDetailsService {
     }
 
     @Transactional
-    public void revokeAllUserTokens(Long userId) {
+    public void revokeAllUserTokens(String userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
 }

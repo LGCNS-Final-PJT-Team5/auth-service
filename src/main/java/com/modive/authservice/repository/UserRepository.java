@@ -6,9 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, String> {
 
     // 이메일로 사용자 찾기
     Optional<User> findByEmail(String email);
@@ -22,11 +23,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 닉네임이 존재하는지 확인
     boolean existsByNickname(String nickname);
 
-    User findByUserId(Long userId);
+    User findByUserId(String userId);
 
     User findByNickname(String nickname);
 
     List<User> findAll();
 
-    Long deleteUserByUserId(Long userId);
+    String deleteUserByUserId(String userId);
 }

@@ -12,6 +12,7 @@ import com.modive.authservice.jwt.JwtTokenProvider;
 import com.modive.authservice.repository.AdminRepository;
 import com.modive.authservice.service.AdminDetailsService;
 import com.modive.authservice.service.KakaoSocialService;
+import com.modive.authservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -33,6 +35,7 @@ public class AuthController {
 
     private final KakaoSocialService kakaoSocialService;
     private final AdminDetailsService adminDetailsService;
+    private final UserService userService;
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
@@ -79,6 +82,11 @@ public class AuthController {
         return new ApiResponse<>(HttpStatus.OK, response);
     }
 
+    @GetMapping("/nickname")
+    public ApiResponse<Boolean> nicknameDuplicateCheck(@RequestParam("search") String nickname) {
+        return new ApiResponse<>(HttpStatus.OK, userService.nicknameDuplicateCheck(nickname));
+    }
+
     @PostMapping("/refresh")
     public ApiResponse<TokenRefreshResponse> refreshToken(@RequestBody TokenRefreshRequest request) {
         TokenRefreshResponse tokenRefreshResponse = kakaoSocialService.refreshToken(request);
@@ -86,7 +94,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(@RequestParam Long userId) {
+    public ApiResponse<Void> logout(@RequestParam String userId) {
         kakaoSocialService.revokeAllUserTokens(userId);
         return new ApiResponse<>(HttpStatus.OK);
     }
