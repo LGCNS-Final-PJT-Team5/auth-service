@@ -2,11 +2,13 @@ package com.modive.authservice.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "USERS")
@@ -18,10 +20,12 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class User {
 
+    @Getter
     @Id
-    @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name="uuid2", strategy = "uuid2")
+    @Column(name = "user_id", columnDefinition = "VARCHAR(36)")
+    private String userId;
 
     private Long reward;
 
@@ -33,15 +37,11 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    private LocalDateTime birthdate;
-
-    private LocalDateTime licenseDate;
-
     private boolean alarm;
 
-    private String gender;
+    private String interest;
 
-    private String phone;
+    private Long drivingExperience;
 
     private String socialId;  // 소셜 로그인 ID (카카오, 구글 등)
 
@@ -55,10 +55,6 @@ public class User {
     private LocalDateTime updateDateTime;
 
     private boolean isActive;
-
-    public Long getUserId() {
-        return userId;
-    }
 
     // 사용자 정보 업데이트 메서드
     public void updateProfile(String nickname, String profileImage) {
@@ -77,17 +73,18 @@ public class User {
     }
 
     // 정적 팩토리 메서드
-    public static User of(String nickname, String email, String socialId, String socialType) {
+    public static User of(String name, String nickname, String email, String interest, Long drivingExperience, String socialId, String socialType) {
         return User.builder()
                 .reward(0L)
                 .nickname(nickname)
-                .name(nickname)
+                .name(name)
                 .email(email)
+                .interest(interest)
+                .drivingExperience(drivingExperience)
                 .alarm(false)
                 .socialId(socialId)
                 .socialType(socialType)
                 .isActive(true)
                 .build();
     }
-
 }

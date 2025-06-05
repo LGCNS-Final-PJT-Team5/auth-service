@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public class AdminDetails implements UserDetails {
 
@@ -15,7 +16,7 @@ public class AdminDetails implements UserDetails {
         this.admin = admin;
     }
 
-    public Long getAdminId() {
+    public String getAdminId() {
         return admin.getAdminId();
     }
 

@@ -4,42 +4,47 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
-@Table(name = "ADMINS")
+@Table(name = "CARS")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Admin {
+public class Car {
 
     @Getter
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
-    @Column(name = "admin_id", columnDefinition = "VARCHAR(36)")
-    private String adminId;
+    @Column(name = "car_id", columnDefinition = "VARCHAR(36)")
+    private String carId;
 
-    @Column(nullable = false, unique = true)
-    private String nickname;
-
-    @Column(nullable = false, unique = true)
-    private String id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(nullable = false)
-    private String pw;
+    private String number;
+    
+    @Column(nullable = false)
+    private boolean active;
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createDateTime;
 
-    @LastModifiedDate
-    private LocalDateTime updateDateTime;
+    public static Car of(final User user, final String number) {
+        return Car.builder()
+                .user(user)
+                .number(number)
+                .active(true)
+                .createDateTime(LocalDateTime.now())
+                .build();
+    }
 }
