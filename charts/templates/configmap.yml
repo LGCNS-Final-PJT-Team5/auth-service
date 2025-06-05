@@ -29,3 +29,10 @@ data:
           grant-type: {{ .Values.config.oauth.kakao.granttype | default "authorization_code"}}
       jwt:
         secret: ${JWT_SECRET}
+
+    logging:
+      level:
+        root: INFO
+        com.modive: DEBUG  # 원하는 패키지 로그 확인
+      pattern:
+        console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"

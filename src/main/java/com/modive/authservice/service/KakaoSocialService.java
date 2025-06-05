@@ -23,6 +23,7 @@ import com.modive.authservice.dto.response.KakaoUserResponse;
 import com.modive.authservice.dto.response.SignUpSuccessResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KakaoSocialService {
@@ -77,19 +79,29 @@ public class KakaoSocialService {
 
     @Transactional
     public SignUpSuccessResponse kakaoSignUp(final String accessToken) {
+        log.info("[kakaoSignUp] 카카오 회원가입 요청 시작");
+        log.info("[kakaoSignUp] accessToken: {}", accessToken);
 
         KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + accessToken);
+        log.info("[kakaoSignUp] Kakao 사용자 정보 수신 완료: id={}, email={}",
+                userResponse.id(),
+                userResponse.kakaoAccount() != null ? userResponse.kakaoAccount().email() : "null");
 
         Optional<User> user = findKakaoUser(userResponse.id());
+        log.info("[kakaoSignUp] 기존 사용자 조회 결과: {}", user.isPresent());
 
         String id = user.map(User::getUserId)
                 .orElse(null);
 
+        log.info("[kakaoSignUp] 사용자 ID: {}", id);
         if (id == null) {
             throw new SignupRequiredException();
         }
 
         String[] TokenSet = generateToken(id);
+        log.info("[kakaoSignUp] 토큰 발급 완료: accessToken={}, refreshToken={}",
+                TokenSet[0].substring(0, 10) + "...",
+                TokenSet[1].substring(0, 10) + "...");
 
         return SignUpSuccessResponse.of(TokenSet[0], TokenSet[1]);
     }
