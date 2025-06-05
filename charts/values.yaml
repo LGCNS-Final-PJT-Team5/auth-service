@@ -30,5 +30,5 @@ config:
     driverclassname: com.mysql.cj.jdbc.Driver
   oauth:
     kakao:
-      redirecturi: http://localhost:8080/oauth/kakao/code
+      redirecturi: http://k8s-sharedalb-475c831b0b-1810739505.ap-northeast-2.elb.amazonaws.com/oauth/kakao/code
       granttype: authorization_code
