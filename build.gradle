@@ -55,6 +55,8 @@ dependencies {
     // mysql
     implementation 'mysql:mysql-connector-java:8.0.33'
 
+    // Micrometer Prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 dependencyManagement {

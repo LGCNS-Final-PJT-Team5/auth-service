@@ -36,3 +36,18 @@ data:
         com.modive: DEBUG  # 원하는 패키지 로그 확인
       pattern:
         console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: "*"
+      endpoint:
+        health:
+          show-details: always
+        prometheus:
+          enabled: true
+      metrics:
+        export:
+          prometheus:
+            enabled: true
