@@ -1,8 +1,10 @@
 package com.modive.authservice.service;
 
+import com.modive.authservice.domain.User;
 import com.modive.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -13,4 +15,14 @@ public class UserService {
     public boolean nicknameDuplicateCheck(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
+
+    // FCM 토큰 업데이트 메서드
+    @Transactional
+    public void updateFcmToken(String userId, String fcmToken) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다: " + userId));
+        user.updateFcmToken(fcmToken);
+    }
+
+
 }

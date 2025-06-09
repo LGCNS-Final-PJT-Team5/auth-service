@@ -31,6 +31,7 @@ public class User {
 
     private String nickname;
 
+
     @Column(nullable = false)
     private String name;
 
@@ -55,6 +56,14 @@ public class User {
     private LocalDateTime updateDateTime;
 
     private boolean isActive;
+
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
 
     // 사용자 정보 업데이트 메서드
     public void updateProfile(String nickname, String profileImage) {

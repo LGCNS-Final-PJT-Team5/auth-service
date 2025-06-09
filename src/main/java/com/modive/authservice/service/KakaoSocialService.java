@@ -23,6 +23,7 @@ import com.modive.authservice.dto.response.KakaoUserResponse;
 import com.modive.authservice.dto.response.SignUpSuccessResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KakaoSocialService {
@@ -76,22 +78,24 @@ public class KakaoSocialService {
     }
 
     @Transactional
-    public SignUpSuccessResponse kakaoSignUp(final String accessToken) {
+    public SignUpSuccessResponse kakaoSignUp(final String accessToken, final String fcmToken) {
 
         KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + accessToken);
+        log.info("[kakaoSignUp] Kakao 사용자 정보 수신 완료: id={}, email={}",
+                userResponse.id(),
+                userResponse.kakaoAccount() != null ? userResponse.kakaoAccount().email() : "null");
 
-        Optional<User> user = findKakaoUser(userResponse.id());
+        User user = userRepository.findBySocialIdAndSocialType(String.valueOf(userResponse.id()), "kakao")
+                .orElseThrow(SignupRequiredException::new);
 
-        String id = user.map(User::getUserId)
-                .orElse(null);
-
-        if (id == null) {
-            throw new SignupRequiredException();
+        // FCM 토큰이 전달되었으면 업데이트
+        if (fcmToken != null && !fcmToken.isBlank()) {
+            user.setFcmToken(fcmToken);
         }
 
-        String[] TokenSet = generateToken(id);
+        String[] tokenSet = generateToken(user.getUserId());
 
-        return SignUpSuccessResponse.of(TokenSet[0], TokenSet[1]);
+        return SignUpSuccessResponse.of(tokenSet[0], tokenSet[1]);
     }
 
     private String[] generateToken(String id) {
