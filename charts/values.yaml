@@ -1,0 +1,34 @@
+replicaCount: 1
+
+image:
+  repository: 026274465258.dkr.ecr.ap-northeast-2.amazonaws.com/auth-service
+  tag: 20250609-87cbc45
+  pullPolicy: IfNotPresent    # 이미지 가져오는 정책 로컬에 없을 때만 pull
+
+service:
+  type: ClusterIP   # 클러스터 내부에서만 접근 가능 (기본값)
+  port: 80
+
+# 헬스체크 설정
+healthCheck:
+  enabled: true
+  path: /actuator/health
+  port: 8080
+  initialDelaySeconds: 60
+  periodSeconds: 10
+
+# Auth Service Config 값
+config:
+  server:
+    port: 8080
+  app:
+    name: auth-service
+  jpa:
+    hibernate:
+      ddlauto: update
+  datasource:
+    driverclassname: com.mysql.cj.jdbc.Driver
+  oauth:
+    kakao:
+      redirecturi: http://k8s-sharedalb-475c831b0b-1810739505.ap-northeast-2.elb.amazonaws.com/oauth/kakao/code
+      granttype: authorization_code
