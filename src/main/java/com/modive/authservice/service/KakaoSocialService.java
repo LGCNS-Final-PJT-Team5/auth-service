@@ -168,7 +168,8 @@ public class KakaoSocialService {
                 String.valueOf(userResponse.id()),
                 "kakao"
         );
-
+        // FCM 토큰 세팅
+        user.setFcmToken(request.getFcmToken());
         String id = userRepository.save(user).getUserId();
 
         Car car = Car.of(user, request.getCarNumber());

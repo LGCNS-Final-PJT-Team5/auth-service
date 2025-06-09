@@ -15,14 +15,4 @@ public class UserService {
     public boolean nicknameDuplicateCheck(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
-
-    // FCM 토큰 업데이트 메서드
-    @Transactional
-    public void updateFcmToken(String userId, String fcmToken) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다: " + userId));
-        user.updateFcmToken(fcmToken);
-    }
-
-
 }
