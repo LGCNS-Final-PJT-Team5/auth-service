@@ -67,7 +67,7 @@ public class AuthController {
             @RequestBody final AccessTokenRequest request
     ) {
         try {
-            SignUpSuccessResponse response = kakaoSocialService.kakaoSignUp(request.getAccessToken());
+            SignUpSuccessResponse response = kakaoSocialService.kakaoSignUp(request.getAccessToken(), request.getFcmToken());
             return new ApiResponse<>(HttpStatus.OK, response);
         } catch (SignupRequiredException e) {
             return new ApiResponse<>(HttpStatus.NO_CONTENT);

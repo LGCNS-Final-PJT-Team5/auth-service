@@ -78,32 +78,24 @@ public class KakaoSocialService {
     }
 
     @Transactional
-    public SignUpSuccessResponse kakaoSignUp(final String accessToken) {
-        log.info("[kakaoSignUp] 카카오 회원가입 요청 시작");
-        log.info("[kakaoSignUp] accessToken: {}", accessToken);
+    public SignUpSuccessResponse kakaoSignUp(final String accessToken, final String fcmToken) {
 
         KakaoUserResponse userResponse = kakaoApiClient.getUserInformation("Bearer " + accessToken);
         log.info("[kakaoSignUp] Kakao 사용자 정보 수신 완료: id={}, email={}",
                 userResponse.id(),
                 userResponse.kakaoAccount() != null ? userResponse.kakaoAccount().email() : "null");
 
-        Optional<User> user = findKakaoUser(userResponse.id());
-        log.info("[kakaoSignUp] 기존 사용자 조회 결과: {}", user.isPresent());
+        User user = userRepository.findBySocialIdAndSocialType(String.valueOf(userResponse.id()), "kakao")
+                .orElseThrow(SignupRequiredException::new);
 
-        String id = user.map(User::getUserId)
-                .orElse(null);
-
-        log.info("[kakaoSignUp] 사용자 ID: {}", id);
-        if (id == null) {
-            throw new SignupRequiredException();
+        // FCM 토큰이 전달되었으면 업데이트
+        if (fcmToken != null && !fcmToken.isBlank()) {
+            user.setFcmToken(fcmToken);
         }
 
-        String[] TokenSet = generateToken(id);
-        log.info("[kakaoSignUp] 토큰 발급 완료: accessToken={}, refreshToken={}",
-                TokenSet[0].substring(0, 10) + "...",
-                TokenSet[1].substring(0, 10) + "...");
+        String[] tokenSet = generateToken(user.getUserId());
 
-        return SignUpSuccessResponse.of(TokenSet[0], TokenSet[1]);
+        return SignUpSuccessResponse.of(tokenSet[0], tokenSet[1]);
     }
 
     private String[] generateToken(String id) {
@@ -176,6 +168,9 @@ public class KakaoSocialService {
                 String.valueOf(userResponse.id()),
                 "kakao"
         );
+
+        // FCM 토큰 세팅
+        user.setFcmToken(request.getFcmToken());
 
         String id = userRepository.save(user).getUserId();
 
