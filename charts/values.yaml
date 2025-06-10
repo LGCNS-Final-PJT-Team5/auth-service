@@ -14,7 +14,7 @@ healthCheck:
   enabled: true
   path: /actuator/health
   port: 8080
-  initialDelaySeconds: 60
+  initialDelaySeconds: 120
   periodSeconds: 10
 
 # Auth Service Config 값
